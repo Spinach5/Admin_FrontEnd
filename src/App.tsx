@@ -11,7 +11,7 @@ import { ShopList } from './components/Shop/ShopList';
 import { FoodList } from './components/Food/FoodList';
 import { AffairList } from './components/Affair/AffairList';
 import { AffairCategoryList } from './components/AffairCategory/AffairCategoryList';
-import { ClasstablePage } from './components/Classtable/ClasstablePage';
+
 import theme from './theme/theme';
 
 export default function App() {
@@ -31,7 +31,7 @@ export default function App() {
                 <Route path="affairs" element={<AffairList />} />
                 <Route path="affair-categories" element={<AffairCategoryList />} />
                 <Route path="change-password" element={<ChangePasswordPage />} />
-                <Route path="classtable" element={<ClasstablePage />} />
+
               </Route>
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>

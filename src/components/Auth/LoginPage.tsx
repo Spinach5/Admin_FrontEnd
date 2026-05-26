@@ -41,9 +41,28 @@ export function LoginPage() {
 
   return (
     <Box
-      sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}
+      sx={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        minHeight: '100vh',
+        backgroundImage: 'url(/login-bg.jpg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        position: 'relative',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        }
+      }}
     >
-      <Card sx={{ p: 4, width: 400, maxWidth: '90vw' }}>
+      <Card sx={{ p: 4, width: 400, maxWidth: '90vw', bgcolor: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(10px)', zIndex: 1 }}>
         <Typography variant="h5" sx={{ fontWeight: 700, textAlign: 'center', mb: 3 }}>
           后台管理系统
         </Typography>

@@ -1,6 +1,6 @@
 import {
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-  Paper, CircularProgress, Box, Typography, Button, Skeleton, IconButton,
+  Paper, Box, Typography, Button, Skeleton, IconButton,
 } from '@mui/material';
 import { Refresh, Edit, Delete } from '@mui/icons-material';
 

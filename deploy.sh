@@ -9,7 +9,7 @@ echo "构建前端项目..."
 npm run build
 
 echo "同步构建产物到服务器 ${SSH_ALIAS}:${REMOTE_DIR} ..."
-rsync -avzi --delete  ./dist/ --rsync-path='sudo rsync' "${SSH_ALIAS}:${REMOTE_DIR}/"
+rsync -avzi --delete --exclude='.user.ini' ./dist/ --rsync-path='sudo rsync' "${SSH_ALIAS}:${REMOTE_DIR}/"
 
 echo "重启 Nginx 服务..."
 ssh ${SSH_ALIAS} "sudo systemctl restart nginx"

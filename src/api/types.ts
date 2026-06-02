@@ -55,10 +55,31 @@ export interface Affair {
   created_at: string;
 }
 
+export interface NormalUser {
+  id: number;
+  stuId: string;
+  nickName: string;
+  schoolId: string;
+  createdAt: string;
+  isDeleted: number;
+}
+
 export interface AffairCategory {
   id: number;
   name: string;
   created_at: string;
+}
+
+export interface Book {
+  id: number;
+  title: string;
+  category: string;
+  price: string;
+  isbn: string;
+  user_id: number;
+  status: string;
+  nickName: string;
+  stuId: string;
 }
 
 export interface ExcelPreview {

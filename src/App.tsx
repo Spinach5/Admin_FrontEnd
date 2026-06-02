@@ -15,6 +15,8 @@ const FoodList = lazy(() => import('./components/Food/FoodList').then(m => ({ de
 const AffairList = lazy(() => import('./components/Affair/AffairList').then(m => ({ default: m.AffairList })));
 const AffairCategoryList = lazy(() => import('./components/AffairCategory/AffairCategoryList').then(m => ({ default: m.AffairCategoryList })));
 const ChangePasswordPage = lazy(() => import('./components/Auth/ChangePasswordPage').then(m => ({ default: m.ChangePasswordPage })));
+const UserList = lazy(() => import('./components/User/UserList').then(m => ({ default: m.UserList })));
+const BookList = lazy(() => import('./components/Book/BookList').then(m => ({ default: m.BookList })));
 
 const PageLoader = () => (
   <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 400 }}>
@@ -39,6 +41,8 @@ export default function App() {
                   <Route path="foods" element={<FoodList />} />
                   <Route path="affairs" element={<AffairList />} />
                   <Route path="affair-categories" element={<AffairCategoryList />} />
+                  <Route path="users" element={<UserList />} />
+                  <Route path="books" element={<BookList />} />
                   <Route path="change-password" element={<ChangePasswordPage />} />
                 </Route>
                 <Route path="*" element={<Navigate to="/" replace />} />

@@ -3,11 +3,13 @@ import {
   Drawer, List, ListItemButton, ListItemIcon, ListItemText, Toolbar, Divider,
 } from '@mui/material';
 import {
-  People, Store, Restaurant, Assignment, Category, Lock,
+  People, Group, Store, Restaurant, MenuBook, Assignment, Category, Lock,
 } from '@mui/icons-material';
 
 const menuItems = [
   { name: '管理员列表', path: '/admin', icon: <People /> },
+  { name: '用户列表', path: '/users', icon: <Group /> },
+  { name: '书籍列表', path: '/books', icon: <MenuBook /> },
   { name: '餐厅列表', path: '/shops', icon: <Store /> },
   { name: '食物列表', path: '/foods', icon: <Restaurant /> },
   { name: '事务列表', path: '/affairs', icon: <Assignment /> },

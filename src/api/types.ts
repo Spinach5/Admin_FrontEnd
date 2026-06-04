@@ -74,8 +74,10 @@ export interface Book {
   id: number;
   title: string;
   category: string;
+  image_url: string;
   price: string;
   isbn: string;
+  contact: string;
   user_id: number;
   status: string;
   nickName: string;

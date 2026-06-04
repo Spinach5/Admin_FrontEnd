@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Button, Typography, Link } from '@mui/material';
 import { Add, Refresh } from '@mui/icons-material';
 import { useSnackbar } from 'notistack';
 import { DataTable, type Column } from '../Common/DataTable';
@@ -57,8 +57,12 @@ export function BookList() {
     { key: 'id', label: 'ID', width: '60px' },
     { key: 'title', label: '书名' },
     { key: 'category', label: '分类' },
+    { key: 'image', label: '书籍图片', render: (r) => r.image_url
+      ? <Link href={r.image_url} target="_blank" rel="noopener" sx={{ cursor: 'pointer' }}>点击查看</Link>
+      : '暂无图片' },
     { key: 'price', label: '价格' },
     { key: 'isbn', label: 'ISBN' },
+    { key: 'contact', label: '联系方式' },
     { key: 'status', label: '状态', render: (r) => r.status === 'active' ? '在售' : '下架' },
     { key: 'nickName', label: '发布者' },
     { key: 'stuId', label: '学号' },

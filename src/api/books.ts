@@ -5,8 +5,10 @@ interface BookItem {
   book_id: number;
   title: string;
   category: string;
+  image_url: string;
   price: string;
   isbn: string;
+  contact: string;
   user_id: number;
   status: string;
   nickName: string;
@@ -27,17 +29,26 @@ export async function getBook(id: number) {
   return { ...res.data, data: res.data.data ? mapBook(res.data.data) : undefined };
 }
 
-export async function createBook(data: Omit<Book, 'id' | 'nickName' | 'stuId'>) {
-  const res = await client.post<ApiResponse>('/books', data);
+export async function createBook(data: FormData) {
+  const res = await client.post<ApiResponse>('/books', data, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
   return res.data;
 }
 
-export async function updateBook(id: number, data: Omit<Book, 'id' | 'nickName' | 'stuId'>) {
-  const res = await client.put<ApiResponse>(`/books/${id}`, data);
+export async function updateBook(id: number, data: FormData) {
+  const res = await client.put<ApiResponse>(`/books/${id}`, data, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
   return res.data;
 }
 
 export async function deleteBook(id: number) {
   const res = await client.delete<ApiResponse>(`/books/${id}`);
+  return res.data;
+}
+
+export async function getCategories() {
+  const res = await client.get<ApiResponse<string[]>>('/books/categories');
   return res.data;
 }

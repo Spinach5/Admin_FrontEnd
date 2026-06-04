@@ -58,6 +58,7 @@ export function AdminList() {
   const columns: Column<User>[] = [
     { key: 'id', label: 'ID', width: '60px' },
     { key: 'account', label: '账户' },
+    { key: 'schoolId', label: '学校代码' },
     { key: 'super', label: '管理员', render: (r) => r.is_super === 1 ? '是' : '否' },
     { key: 'active', label: '状态', render: (r) => r.is_active === 1 ? '已登录' : '未登录' },
     { key: 'created_at', label: '创建时间', render: (r) => r.created_at?.split('T')[0] },

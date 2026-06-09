@@ -3,7 +3,7 @@ import {
   Drawer, List, ListItemButton, ListItemIcon, ListItemText, Toolbar, Divider,
 } from '@mui/material';
 import {
-  People, Group, Store, Restaurant, MenuBook, Assignment, Category, Lock,
+  People, Group, Store, Restaurant, MenuBook, Assignment, Category, Lock, Groups,
 } from '@mui/icons-material';
 
 const menuItems = [
@@ -14,6 +14,7 @@ const menuItems = [
   { name: '食物列表', path: '/foods', icon: <Restaurant /> },
   { name: '事务列表', path: '/affairs', icon: <Assignment /> },
   { name: '事务种类', path: '/affair-categories', icon: <Category /> },
+  { name: '社团列表', path: '/clubs', icon: <Groups /> },
 
 ];
 

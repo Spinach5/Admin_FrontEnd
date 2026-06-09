@@ -70,6 +70,20 @@ export interface AffairCategory {
   created_at: string;
 }
 
+export interface Club {
+  id: number;
+  name: string;
+  introduction: string;
+  activities: string;
+  category: string;
+  image_url: string;
+  schoolId: string;
+  nature: number;
+  contact: string;
+  principal_id?: number;
+  principal_name?: string;
+}
+
 export interface Book {
   id: number;
   title: string;

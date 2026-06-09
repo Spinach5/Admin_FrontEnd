@@ -17,6 +17,7 @@ const AffairCategoryList = lazy(() => import('./components/AffairCategory/Affair
 const ChangePasswordPage = lazy(() => import('./components/Auth/ChangePasswordPage').then(m => ({ default: m.ChangePasswordPage })));
 const UserList = lazy(() => import('./components/User/UserList').then(m => ({ default: m.UserList })));
 const BookList = lazy(() => import('./components/Book/BookList').then(m => ({ default: m.BookList })));
+const ClubList = lazy(() => import('./components/Club/ClubList').then(m => ({ default: m.ClubList })));
 
 const PageLoader = () => (
   <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 400 }}>
@@ -43,6 +44,7 @@ export default function App() {
                   <Route path="affair-categories" element={<AffairCategoryList />} />
                   <Route path="users" element={<UserList />} />
                   <Route path="books" element={<BookList />} />
+                  <Route path="clubs" element={<ClubList />} />
                   <Route path="change-password" element={<ChangePasswordPage />} />
                 </Route>
                 <Route path="*" element={<Navigate to="/" replace />} />

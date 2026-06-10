@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, MenuItem } from '@mui/material';
 import { useSnackbar } from 'notistack';
-import { createClub, updateClub } from '../../api/clubs';
+import { createClub, updateClub, getClubCategories } from '../../api/clubs';
 import { getUsers } from '../../api/users';
 import type { Club, NormalUser } from '../../api/types';
 
@@ -18,6 +18,7 @@ export function ClubForm({ open, club, onClose, onSuccess }: Props) {
   const [contact, setContact] = useState('');
   const [principalId, setPrincipalId] = useState('');
   const [users, setUsers] = useState<NormalUser[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
   const isEdit = !!club;
@@ -25,6 +26,7 @@ export function ClubForm({ open, club, onClose, onSuccess }: Props) {
   useEffect(() => {
     if (open) {
       getUsers().then(res => { if (res.success) setUsers(res.data || []); });
+      getClubCategories().then(res => { if (res.success) setCategories(res.data || []); });
     }
   }, [open]);
 
@@ -74,7 +76,9 @@ export function ClubForm({ open, club, onClose, onSuccess }: Props) {
         <TextField label="社团名称" fullWidth margin="normal" value={name} onChange={(e) => setName(e.target.value)} required />
         <TextField label="社团简介" fullWidth margin="normal" value={introduction} onChange={(e) => setIntroduction(e.target.value)} multiline rows={2} />
         <TextField label="社团活动" fullWidth margin="normal" value={activities} onChange={(e) => setActivities(e.target.value)} multiline rows={2} />
-        <TextField label="社团类别" fullWidth margin="normal" value={category} onChange={(e) => setCategory(e.target.value)} />
+        <TextField label="社团类别" select fullWidth margin="normal" value={category} onChange={(e) => setCategory(e.target.value)}>
+          {categories.map((c) => <MenuItem key={c} value={c}>{c}</MenuItem>)}
+        </TextField>
         <TextField label="学校id" fullWidth margin="normal" value={schoolId} onChange={(e) => setSchoolId(e.target.value)} />
         <TextField label="图片链接" fullWidth margin="normal" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} />
         <TextField label="社团性质" select fullWidth margin="normal" value={nature} onChange={(e) => setNature(e.target.value)}>

@@ -16,6 +16,11 @@ export async function updateClub(id: number, data: Omit<Club, 'id'>) {
   return res.data;
 }
 
+export async function getClubCategories() {
+  const res = await client.get<ApiResponse<string[]>>('/clubs/categories');
+  return res.data;
+}
+
 export async function deleteClub(id: number) {
   const res = await client.delete<ApiResponse>(`/clubs/${id}`);
   return res.data;

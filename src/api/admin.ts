@@ -6,12 +6,12 @@ export async function getUsers() {
   return res.data;
 }
 
-export async function createUser(data: { account: string; password: string; is_super: number }) {
+export async function createUser(data: { account: string; password: string; schoolId: string; is_super: number }) {
   const res = await client.post<ApiResponse>('/admin/admins', data);
   return res.data;
 }
 
-export async function updateUser(id: number, data: { account: string; password?: string; is_super: number; is_active: number }) {
+export async function updateUser(id: number, data: { account: string; password?: string; schoolId: string; is_super: number; is_active: number }) {
   const res = await client.put<ApiResponse>(`/admin/admins/${id}`, data);
   return res.data;
 }

@@ -25,6 +25,7 @@ interface Props {
 export function AdminForm({ open, user, onClose, onSuccess }: Props) {
   const [account, setAccount] = useState("");
   const [password, setPassword] = useState("");
+  const [schoolId, setSchoolId] = useState("");
   const [isSuper, setIsSuper] = useState(0);
   const [isActive, setIsActive] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -35,11 +36,13 @@ export function AdminForm({ open, user, onClose, onSuccess }: Props) {
     if (user) {
       setAccount(user.account);
       setPassword("");
+      setSchoolId(user.schoolId || "");
       setIsSuper(user.is_super);
       setIsActive(user.is_active);
     } else {
       setAccount("");
       setPassword("");
+      setSchoolId("");
       setIsSuper(0);
       setIsActive(0);
     }
@@ -65,10 +68,11 @@ export function AdminForm({ open, user, onClose, onSuccess }: Props) {
         ? await updateUser(user!.id, {
             account,
             password: password || undefined,
+            schoolId,
             is_super: isSuper,
             is_active: isActive,
           })
-        : await createUser({ account, password, is_super: isSuper });
+        : await createUser({ account, password, schoolId, is_super: isSuper });
       if (res.success) {
         enqueueSnackbar(isEdit ? "更新成功" : "添加成功", {
           variant: "success",
@@ -94,6 +98,13 @@ export function AdminForm({ open, user, onClose, onSuccess }: Props) {
           margin="normal"
           value={account}
           onChange={(e) => setAccount(e.target.value)}
+        />
+        <TextField
+          label="学校代码"
+          fullWidth
+          margin="normal"
+          value={schoolId}
+          onChange={(e) => setSchoolId(e.target.value)}
         />
         <TextField
           label={isEdit ? "新密码 (留空不修改)" : "密码"}

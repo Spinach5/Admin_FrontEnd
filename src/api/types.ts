@@ -8,6 +8,7 @@ export interface ApiResponse<T = unknown> {
 export interface User {
   id: number;
   account: string;
+  schoolId: string;
   is_super: number;
   is_active: number;
   created_at: string;

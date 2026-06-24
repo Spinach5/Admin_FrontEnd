@@ -14,10 +14,14 @@ interface Props {
 
 export function BookForm({ open, book, onClose, onSuccess }: Props) {
   const [title, setTitle] = useState('');
+  const [author, setAuthor] = useState('');
+  const [publisher, setPublisher] = useState('');
   const [category, setCategory] = useState('');
   const [price, setPrice] = useState('');
   const [isbn, setIsbn] = useState('');
   const [contact, setContact] = useState('');
+  const [description, setDescription] = useState('');
+  const [condition, setCondition] = useState('');
   const [status, setStatus] = useState('active');
   const [categories, setCategories] = useState<string[]>([]);
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -34,20 +38,28 @@ export function BookForm({ open, book, onClose, onSuccess }: Props) {
     }
     if (book) {
       setTitle(book.title);
+      setAuthor(book.author || '');
+      setPublisher(book.publisher || '');
       setCategory(book.category);
       setPrice(book.price);
       setIsbn(book.isbn);
       setContact(book.contact || '');
+      setDescription(book.description || '');
+      setCondition(book.condition || '');
       setStatus(book.status);
       setImageFile(null);
       setImageDeleted(false);
       setImagePreview(book.image_url || '');
     } else {
       setTitle('');
+      setAuthor('');
+      setPublisher('');
       setCategory('');
       setPrice('');
       setIsbn('');
       setContact('');
+      setDescription('');
+      setCondition('');
       setStatus('active');
       setImageFile(null);
       setImageDeleted(false);
@@ -82,10 +94,14 @@ export function BookForm({ open, book, onClose, onSuccess }: Props) {
     setLoading(true);
     const fd = new FormData();
     fd.append('title', title.trim());
+    fd.append('author', author.trim());
+    fd.append('publisher', publisher.trim());
     fd.append('category', category);
     fd.append('price', price);
     fd.append('isbn', isbn);
     fd.append('contact', contact);
+    fd.append('description', description);
+    fd.append('condition', condition);
     fd.append('status', status);
     if (imageFile) {
       fd.append('image', imageFile);
@@ -101,8 +117,8 @@ export function BookForm({ open, book, onClose, onSuccess }: Props) {
       } else {
         enqueueSnackbar(res.message || '操作失败', { variant: 'error' });
       }
-    } catch {
-      enqueueSnackbar('网络错误', { variant: 'error' });
+    } catch (err: any) {
+      enqueueSnackbar(err?.response?.data?.message || '网络错误', { variant: 'error' });
     } finally {
       setLoading(false);
     }
@@ -163,6 +179,8 @@ export function BookForm({ open, book, onClose, onSuccess }: Props) {
         </Box>
         <input ref={fileRef} type="file" accept="image/*" hidden onChange={handleFileChange} />
         <TextField label="书名" required fullWidth margin="normal" value={title} onChange={(e) => setTitle(e.target.value)} />
+        <TextField label="作者" fullWidth margin="normal" value={author} onChange={(e) => setAuthor(e.target.value)} />
+        <TextField label="出版社" fullWidth margin="normal" value={publisher} onChange={(e) => setPublisher(e.target.value)} />
         <FormControl fullWidth margin="normal">
           <InputLabel>分类</InputLabel>
           <Select value={category} label="分类" onChange={(e) => setCategory(e.target.value)}>
@@ -172,6 +190,8 @@ export function BookForm({ open, book, onClose, onSuccess }: Props) {
         <TextField label="价格" fullWidth margin="normal" value={price} onChange={(e) => setPrice(e.target.value)} />
         <TextField label="ISBN" fullWidth margin="normal" value={isbn} onChange={(e) => setIsbn(e.target.value)} />
         <TextField label="联系方式" fullWidth margin="normal" value={contact} onChange={(e) => setContact(e.target.value)} />
+        <TextField label="描述" fullWidth margin="normal" value={description} onChange={(e) => setDescription(e.target.value)} multiline rows={3} />
+        <TextField label="成色" fullWidth margin="normal" value={condition} onChange={(e) => setCondition(e.target.value)} placeholder="例如：几乎全新、九成新" />
         <FormControl fullWidth margin="normal">
           <InputLabel>状态</InputLabel>
           <Select value={status} label="状态" onChange={(e) => setStatus(e.target.value)}>

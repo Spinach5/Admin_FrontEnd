@@ -85,18 +85,45 @@ export interface Club {
   principal_name?: string;
 }
 
+export interface BookImage {
+  id: number;
+  book_id: number;
+  url: string;
+  sort_order: number;
+}
+
 export interface Book {
   id: number;
   title: string;
+  author: string;
+  publisher: string;
   category: string;
   image_url: string;
+  cover_url: string;
   price: string;
   isbn: string;
   contact: string;
+  description: string;
+  condition: string;
   user_id: number;
   status: string;
+  school_id: string;
+  is_delivery: number;
+  book_type: number;
+  create_time: string;
   nickName: string;
   stuId: string;
+  images: BookImage[];
+  want_count: number;
+  is_wanted: boolean;
+}
+
+export interface BookCategory {
+  id: number;
+  name: string;
+  school_id: string;
+  sort_order: number;
+  book_count: number;
 }
 
 export interface ExcelPreview {

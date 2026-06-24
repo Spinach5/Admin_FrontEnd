@@ -1,41 +1,39 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Button, Typography, Chip } from '@mui/material';
 import { Add, Refresh } from '@mui/icons-material';
 import { useSnackbar } from 'notistack';
 import { DataTable, type Column } from '../Common/DataTable';
 import { ConfirmDialog } from '../Common/ConfirmDialog';
 import { SearchBar, type SearchField } from '../Common/SearchBar';
-import { AdminForm } from './AdminForm';
-import { getUsers, deleteUser } from '../../api/admin';
-import { useAuth } from '../../context/AuthContext';
-import type { User } from '../../api/types';
+import { BookCategoryForm } from './BookCategoryForm';
+import { getBookCategories, deleteBookCategory } from '../../api/bookCategories';
+import type { BookCategory } from '../../api/types';
 
 const SEARCH_FIELDS: SearchField[] = [
-  { key: 'account', label: '账户' },
-  { key: 'schoolId', label: '学校代码' },
+  { key: 'name', label: '种类名称' },
+  { key: 'school_id', label: '学校' },
 ];
 
-export function AdminList() {
-  const [users, setUsers] = useState<User[]>([]);
+export function BookCategoryList() {
+  const [categories, setCategories] = useState<BookCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [formOpen, setFormOpen] = useState(false);
-  const [editingUser, setEditingUser] = useState<User | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<User | null>(null);
+  const [editingCat, setEditingCat] = useState<BookCategory | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<BookCategory | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(50);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [searchField, setSearchField] = useState('');
-  const { user: me } = useAuth();
   const { enqueueSnackbar } = useSnackbar();
 
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await getUsers();
-      if (res.success) setUsers(res.data || []);
+      const res = await getBookCategories();
+      if (res.success) setCategories(res.data || []);
       else setError(res.message || '加载失败');
     } catch (err: any) {
       setError(err?.response?.data?.message || '网络错误');
@@ -50,7 +48,7 @@ export function AdminList() {
     if (!deleteTarget) return;
     setDeleting(true);
     try {
-      const res = await deleteUser(deleteTarget.id);
+      const res = await deleteBookCategory(deleteTarget.id);
       if (res.success) {
         enqueueSnackbar('删除成功', { variant: 'success' });
         load();
@@ -65,48 +63,58 @@ export function AdminList() {
     }
   };
 
-  const columns: Column<User>[] = [
+  const columns: Column<BookCategory>[] = [
     { key: 'id', label: 'ID', width: '60px' },
-    { key: 'account', label: '账户' },
-    { key: 'schoolId', label: '学校代码' },
-    { key: 'super', label: '管理员', render: (r) => r.is_super === 1 ? '是' : '否' },
-    { key: 'active', label: '状态', render: (r) => r.is_active === 1 ? '已登录' : '未登录' },
-    { key: 'created_at', label: '创建时间', render: (r) => r.created_at?.split('T')[0] },
-    { key: 'updated_at', label: '更新时间', render: (r) => r.updated_at?.split('T')[0] },
+    { key: 'name', label: '种类名称' },
+    {
+      key: 'book_count',
+      label: '书籍数量',
+      render: (r) => (
+        <Chip
+          label={r.book_count}
+          size="small"
+          color={r.book_count > 0 ? 'primary' : 'default'}
+          variant="outlined"
+        />
+      ),
+    },
+    { key: 'sort_order', label: '排序', width: '80px' },
+    { key: 'school_id', label: '学校', width: '100px' },
   ];
 
-  const filteredUsers = useMemo(() => {
-    if (!searchKeyword.trim()) return users;
+  const filteredCategories = useMemo(() => {
+    if (!searchKeyword.trim()) return categories;
     const kw = searchKeyword.toLowerCase();
-    return users.filter((u) => {
+    return categories.filter((c) => {
       if (searchField) {
-        const v = (u as any)[searchField];
+        const v = (c as any)[searchField];
         return v != null && String(v).toLowerCase().includes(kw);
       }
       return SEARCH_FIELDS.some((f) => {
-        const v = (u as any)[f.key];
+        const v = (c as any)[f.key];
         return v != null && String(v).toLowerCase().includes(kw);
       });
     });
-  }, [users, searchKeyword, searchField]);
+  }, [categories, searchKeyword, searchField]);
 
-  const pagedUsers = filteredUsers.slice((page - 1) * pageSize, page * pageSize);
+  const pagedCategories = filteredCategories.slice((page - 1) * pageSize, page * pageSize);
 
   const handleSearch = () => { setPage(1); };
   const handleClear = () => { setSearchKeyword(''); setSearchField(''); setPage(1); };
 
-  const isSuper = me?.is_super === 1;
-
   return (
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-        <Typography variant="h5" sx={{ fontWeight: 600 }}>管理员列表</Typography>
+        <Typography variant="h5" sx={{ fontWeight: 600 }}>书籍种类</Typography>
         <Box>
-          {isSuper && (
-            <Button variant="contained" startIcon={<Add />} onClick={() => { setEditingUser(null); setFormOpen(true); }} sx={{ mr: 1 }}>
-              添加
-            </Button>
-          )}
+          <Button
+            variant="contained"
+            startIcon={<Add />}
+            onClick={() => { setEditingCat(null); setFormOpen(true); }}
+            sx={{ mr: 1 }}
+          >
+            添加
+          </Button>
           <Button variant="outlined" startIcon={<Refresh />} onClick={load}>刷新</Button>
         </Box>
       </Box>
@@ -121,28 +129,28 @@ export function AdminList() {
       />
       <DataTable
         columns={columns}
-        data={pagedUsers}
+        data={pagedCategories}
         loading={loading}
         error={error}
         onRefresh={load}
-        onEdit={isSuper ? (row) => { setEditingUser(row); setFormOpen(true); } : undefined}
-        onDelete={isSuper ? (row) => setDeleteTarget(row) : undefined}
+        onEdit={(row) => { setEditingCat(row); setFormOpen(true); }}
+        onDelete={(row) => setDeleteTarget(row)}
         pagination={{
-          page, pageSize, total: filteredUsers.length,
+          page, pageSize, total: filteredCategories.length,
           onPageChange: (p) => setPage(p),
           onPageSizeChange: (s) => { setPageSize(s); setPage(1); },
         }}
       />
-      <AdminForm
+      <BookCategoryForm
         open={formOpen}
-        user={editingUser}
+        category={editingCat}
         onClose={() => setFormOpen(false)}
         onSuccess={() => { setFormOpen(false); load(); }}
       />
       <ConfirmDialog
         open={!!deleteTarget}
         title="确认删除"
-        message={`确定要删除用户 "${deleteTarget?.account}" 吗？`}
+        message={`确定要删除书籍种类 "${deleteTarget?.name}" 吗？该种类下的所有书籍也会被删除。`}
         onConfirm={handleDelete}
         onCancel={() => setDeleteTarget(null)}
         loading={deleting}

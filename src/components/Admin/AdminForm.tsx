@@ -81,8 +81,8 @@ export function AdminForm({ open, user, onClose, onSuccess }: Props) {
       } else {
         enqueueSnackbar(res.message || "操作失败", { variant: "error" });
       }
-    } catch {
-      enqueueSnackbar("网络错误", { variant: "error" });
+    } catch (err: any) {
+      enqueueSnackbar(err?.response?.data?.message || "网络错误", { variant: "error" });
     } finally {
       setLoading(false);
     }

@@ -32,8 +32,8 @@ export function LoginPage() {
       } else {
         setError(res.message || '登录失败');
       }
-    } catch {
-      setError('网络错误，请检查网络连接');
+    } catch (err: any) {
+      setError(err?.response?.data?.message || '网络错误，请检查网络连接');
     } finally {
       setLoading(false);
     }

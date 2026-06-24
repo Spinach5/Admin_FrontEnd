@@ -23,7 +23,7 @@ export function AffairCategoryForm({ open, category, onClose, onSuccess }: Props
       const res = isEdit ? await updateAffairCategory(category!.id, { name }) : await createAffairCategory({ name });
       if (res.success) { enqueueSnackbar(isEdit ? '更新成功' : '添加成功', { variant: 'success' }); onSuccess(); }
       else enqueueSnackbar(res.message || '操作失败', { variant: 'error' });
-    } catch { enqueueSnackbar('网络错误', { variant: 'error' }); }
+    } catch (err: any) { enqueueSnackbar(err?.response?.data?.message || '网络错误', { variant: 'error' }); }
     finally { setLoading(false); }
   };
 

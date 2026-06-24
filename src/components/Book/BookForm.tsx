@@ -5,6 +5,8 @@ import { useSnackbar } from 'notistack';
 import { createBook, updateBook, getCategories } from '../../api/books';
 import type { Book } from '../../api/types';
 
+const SLOT_COUNT = 3;
+
 interface Props {
   open: boolean;
   book: Book | null;
@@ -24,10 +26,12 @@ export function BookForm({ open, book, onClose, onSuccess }: Props) {
   const [condition, setCondition] = useState('');
   const [status, setStatus] = useState('active');
   const [categories, setCategories] = useState<string[]>([]);
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imageDeleted, setImageDeleted] = useState(false);
-  const [imagePreview, setImagePreview] = useState('');
+  // 图片槽位：缓存 File 对象 + 预览 URL + 已有远程 URL
+  const [imageFiles, setImageFiles] = useState<(File | null)[]>(Array(SLOT_COUNT).fill(null));
+  const [imagePreviews, setImagePreviews] = useState<string[]>(Array(SLOT_COUNT).fill(''));
+  const [existingUrls, setExistingUrls] = useState<string[]>(Array(SLOT_COUNT).fill(''));
   const [loading, setLoading] = useState(false);
+  const [activeSlot, setActiveSlot] = useState(0);
   const fileRef = useRef<HTMLInputElement>(null);
   const { enqueueSnackbar } = useSnackbar();
   const isEdit = !!book;
@@ -47,9 +51,17 @@ export function BookForm({ open, book, onClose, onSuccess }: Props) {
       setDescription(book.description || '');
       setCondition(book.condition || '');
       setStatus(book.status);
-      setImageFile(null);
-      setImageDeleted(false);
-      setImagePreview(book.image_url || '');
+      const urls: string[] = Array(SLOT_COUNT).fill('');
+      const previews: string[] = Array(SLOT_COUNT).fill('');
+      const existingImages = book.images && book.images.length > 0
+        ? book.images.map((img) => img.url)
+        : book.image_url ? [book.image_url] : [];
+      existingImages.forEach((url, i) => {
+        if (i < SLOT_COUNT) { urls[i] = url; previews[i] = url; }
+      });
+      setExistingUrls(urls);
+      setImageFiles(Array(SLOT_COUNT).fill(null));
+      setImagePreviews(previews);
     } else {
       setTitle('');
       setAuthor('');
@@ -61,9 +73,9 @@ export function BookForm({ open, book, onClose, onSuccess }: Props) {
       setDescription('');
       setCondition('');
       setStatus('active');
-      setImageFile(null);
-      setImageDeleted(false);
-      setImagePreview('');
+      setExistingUrls(Array(SLOT_COUNT).fill(''));
+      setImageFiles(Array(SLOT_COUNT).fill(null));
+      setImagePreviews(Array(SLOT_COUNT).fill(''));
     }
   }, [book, open]);
 
@@ -74,15 +86,31 @@ export function BookForm({ open, book, onClose, onSuccess }: Props) {
       enqueueSnackbar('请选择图片文件', { variant: 'error' });
       return;
     }
-    setImageFile(file);
-    setImageDeleted(false);
-    setImagePreview(URL.createObjectURL(file));
+
+    const slot = activeSlot;
+    // 缓存文件，创建本地预览
+    const newFiles = [...imageFiles];
+    newFiles[slot] = file;
+    setImageFiles(newFiles);
+
+    const newPreviews = [...imagePreviews];
+    newPreviews[slot] = URL.createObjectURL(file);
+    setImagePreviews(newPreviews);
+
+    // 重置 input 以便重复选同一文件
+    if (fileRef.current) fileRef.current.value = '';
   };
 
-  const clearImage = () => {
-    setImageFile(null);
-    setImageDeleted(true);
-    setImagePreview('');
+  const clearSlot = (index: number) => {
+    const newFiles = [...imageFiles];
+    const newPreviews = [...imagePreviews];
+    const newUrls = [...existingUrls];
+    newFiles[index] = null;
+    newPreviews[index] = '';
+    newUrls[index] = '';
+    setImageFiles(newFiles);
+    setImagePreviews(newPreviews);
+    setExistingUrls(newUrls);
   };
 
   const handleSubmit = async () => {
@@ -103,9 +131,14 @@ export function BookForm({ open, book, onClose, onSuccess }: Props) {
     fd.append('description', description);
     fd.append('condition', condition);
     fd.append('status', status);
-    if (imageFile) {
-      fd.append('image', imageFile);
-    } else if (imageDeleted) {
+    // 图片：有文件则发文件，有已有URL则发URL，都没有则发 delete_image
+    const validFiles = imageFiles.filter((f) => f !== null);
+    const validUrls = existingUrls.filter((u) => u);
+    if (validFiles.length > 0) {
+      fd.append('image', validFiles[0]);
+    } else if (validUrls.length > 0) {
+      fd.append('image_url', validUrls[0]);
+    } else {
       fd.append('delete_image', 'true');
     }
 
@@ -128,54 +161,62 @@ export function BookForm({ open, book, onClose, onSuccess }: Props) {
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>{isEdit ? '编辑书籍' : '添加书籍'}</DialogTitle>
       <DialogContent>
-        <Box
-          sx={{
-            position: 'relative',
-            border: '2px dashed #ccc',
-            borderRadius: 2,
-            height: 180,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            mb: 2,
-            mt: 1,
-            overflow: 'hidden',
-            '&:hover': { borderColor: 'primary.main' },
-          }}
-        >
-          {imagePreview ? (
-            <>
-              <Box
-                component="img"
-                src={imagePreview}
-                alt="预览"
-                sx={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
-              />
-              <IconButton
-                size="small"
-                onClick={clearImage}
-                sx={{
-                  position: 'absolute',
-                  top: 4,
-                  right: 4,
-                  bgcolor: 'rgba(0,0,0,0.5)',
-                  color: 'white',
-                  '&:hover': { bgcolor: 'rgba(0,0,0,0.7)' },
-                }}
-              >
-                <Close fontSize="small" />
-              </IconButton>
-            </>
-          ) : (
+        <Typography variant="body2" color="text.secondary" sx={{ mt: 1, mb: 1 }}>
+          书籍图片（最多{SLOT_COUNT}张）
+        </Typography>
+        <Box sx={{ display: 'flex', gap: 1.5, mb: 2 }}>
+          {Array.from({ length: SLOT_COUNT }).map((_, i) => (
             <Box
-              onClick={() => fileRef.current?.click()}
-              sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', width: '100%', height: '100%', justifyContent: 'center' }}
+              key={i}
+              sx={{
+                position: 'relative',
+                flex: 1,
+                aspectRatio: '1 / 1',
+                border: '2px dashed #ccc',
+                borderRadius: 2,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                overflow: 'hidden',
+                cursor: 'pointer',
+                '&:hover': { borderColor: 'primary.main' },
+              }}
+              onClick={() => { setActiveSlot(i); fileRef.current?.click(); }}
             >
-              <CloudUpload sx={{ fontSize: 48, color: 'text.secondary', mb: 1 }} />
-              <Typography color="text.secondary">点击上传图片</Typography>
+              {imagePreviews[i] ? (
+                <>
+                  <Box
+                    component="img"
+                    src={imagePreviews[i]}
+                    alt={`图片${i + 1}`}
+                    sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                  <IconButton
+                    size="small"
+                    onClick={(e) => { e.stopPropagation(); clearSlot(i); }}
+                    sx={{
+                      position: 'absolute',
+                      top: 2,
+                      right: 2,
+                      bgcolor: 'rgba(0,0,0,0.5)',
+                      color: 'white',
+                      '&:hover': { bgcolor: 'rgba(0,0,0,0.7)' },
+                    }}
+                  >
+                    <Close sx={{ fontSize: 14 }} />
+                  </IconButton>
+                </>
+              ) : (
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  <CloudUpload sx={{ fontSize: 28, color: 'text.secondary' }} />
+                  <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5 }}>
+                    图片{i + 1}
+                  </Typography>
+                </Box>
+              )}
             </Box>
-          )}
+          ))}
         </Box>
         <input ref={fileRef} type="file" accept="image/*" hidden onChange={handleFileChange} />
         <TextField label="书名" required fullWidth margin="normal" value={title} onChange={(e) => setTitle(e.target.value)} />

@@ -84,6 +84,15 @@ export async function deleteBook(id: number) {
   return res.data;
 }
 
+export async function uploadBookImage(file: File) {
+  const fd = new FormData();
+  fd.append('file', file);
+  const res = await client.post<ApiResponse<{ url: string }>>('/books/upload-image', fd, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return res.data;
+}
+
 export async function getCategories() {
   const res = await client.get<ApiResponse<string[]>>('/books/categories');
   return res.data;

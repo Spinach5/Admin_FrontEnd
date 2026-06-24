@@ -63,6 +63,7 @@ export interface NormalUser {
   schoolId: string;
   createdAt: string;
   isDeleted: number;
+  is_frozen: number;
 }
 
 export interface AffairCategory {
@@ -124,6 +125,32 @@ export interface BookCategory {
   school_id: string;
   sort_order: number;
   book_count: number;
+}
+
+export interface Conversation {
+  id: number;
+  conversation_id: number;
+  book_id: number;
+  book_title: string;
+  buyer_id: number;
+  buyer_nick: string;
+  buyer_stu_id: string;
+  seller_id: number;
+  seller_nick: string;
+  seller_stu_id: string;
+  message_count: number;
+  last_content: string;
+  last_time: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Message {
+  id: number;
+  conversation_id: number;
+  sender_id: number;
+  content: string;
+  created_at: string;
 }
 
 export interface ExcelPreview {

@@ -30,3 +30,8 @@ export async function hardDeleteUser(id: number) {
   const res = await client.delete<ApiResponse>(`/users/${id}/hard`);
   return res.data;
 }
+
+export async function freezeUser(id: number, frozen: boolean) {
+  const res = await client.put<ApiResponse>(`/users/${id}/freeze`, { frozen });
+  return res.data;
+}

@@ -1,11 +1,11 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Box, Button, Typography, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
-import { Add, Refresh } from '@mui/icons-material';
+import { Box, Button, Typography, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Chip, Tooltip } from '@mui/material';
+import { Add, Refresh, Lock, LockOpen } from '@mui/icons-material';
 import { useSnackbar } from 'notistack';
 import { DataTable, type Column } from '../Common/DataTable';
 import { SearchBar, type SearchField } from '../Common/SearchBar';
 import { UserForm } from './UserForm';
-import { getUsers, deleteUser, hardDeleteUser } from '../../api/users';
+import { getUsers, deleteUser, hardDeleteUser, freezeUser } from '../../api/users';
 import type { NormalUser } from '../../api/types';
 
 const SEARCH_FIELDS: SearchField[] = [
@@ -82,11 +82,42 @@ export function UserList() {
     }
   };
 
+  const handleFreeze = async (user: NormalUser) => {
+    const willFreeze = !user.is_frozen;
+    try {
+      const res = await freezeUser(user.id, willFreeze);
+      if (res.success) {
+        enqueueSnackbar(willFreeze ? '已冻结' : '已解冻', { variant: 'success' });
+        load();
+      } else {
+        enqueueSnackbar(res.message || '操作失败', { variant: 'error' });
+      }
+    } catch (err: any) {
+      enqueueSnackbar(err?.response?.data?.message || '网络错误', { variant: 'error' });
+    }
+  };
+
   const columns: Column<NormalUser>[] = [
     { key: 'id', label: 'ID', width: '60px' },
     { key: 'stuId', label: '学号' },
     { key: 'nickName', label: '昵称' },
     { key: 'schoolId', label: '学校ID' },
+    {
+      key: 'is_frozen',
+      label: '状态',
+      render: (r) => (
+        <Tooltip title={r.is_frozen ? '点击解冻' : '点击冻结'}>
+          <Chip
+            icon={r.is_frozen ? <Lock sx={{ fontSize: 14 }} /> : <LockOpen sx={{ fontSize: 14 }} />}
+            label={r.is_frozen ? '已冻结' : '正常'}
+            size="small"
+            color={r.is_frozen ? 'error' : 'success'}
+            onClick={() => handleFreeze(r)}
+            sx={{ cursor: 'pointer' }}
+          />
+        </Tooltip>
+      ),
+    },
     { key: 'createdAt', label: '创建时间', render: (r) => r.createdAt?.split('T')[0] },
   ];
 

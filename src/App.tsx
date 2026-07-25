@@ -19,6 +19,7 @@ const UserList = lazy(() => import('./components/User/UserList').then(m => ({ de
 const BookList = lazy(() => import('./components/Book/BookList').then(m => ({ default: m.BookList })));
 const ClubList = lazy(() => import('./components/Club/ClubList').then(m => ({ default: m.ClubList })));
 const BookCategoryList = lazy(() => import('./components/BookCategory/BookCategoryList').then(m => ({ default: m.BookCategoryList })));
+const MaterialList = lazy(() => import('./components/Material/MaterialList').then(m => ({ default: m.MaterialList })));
 const ConversationList = lazy(() => import('./components/Conversation/ConversationList').then(m => ({ default: m.ConversationList })));
 
 const PageLoader = () => (
@@ -48,6 +49,7 @@ export default function App() {
                   <Route path="books" element={<BookList />} />
                   <Route path="clubs" element={<ClubList />} />
                   <Route path="book-categories" element={<BookCategoryList />} />
+                  <Route path="materials" element={<MaterialList />} />
                   <Route path="conversations" element={<ConversationList />} />
                   <Route path="change-password" element={<ChangePasswordPage />} />
                 </Route>

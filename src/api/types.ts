@@ -158,3 +158,38 @@ export interface ExcelPreview {
   rows: Record<string, string>[];
   total: number;
 }
+
+// 后端 sql.Null* 类型序列化后的结构
+export interface NullString {
+  String: string;
+  Valid: boolean;
+}
+
+export interface NullFloat64 {
+  Float64: number;
+  Valid: boolean;
+}
+
+export interface Material {
+  id: number;
+  isbn: string;
+  title: string;
+  author: string;
+  publisher: string;
+  price: number;
+  created_at: string;
+  extra_info: string;
+  // 仅按学期查询时附带
+  semester?: string;
+  classes?: string[];
+}
+
+export interface MaterialClass {
+  class_id: number;
+  class_name: string;
+  grade: number | null;
+  major: string;
+  department: string;
+  student_count: number;
+  created_at: string;
+}

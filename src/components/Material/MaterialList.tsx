@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
-  Box, Button, Typography, Chip, Tooltip, TextField, MenuItem, FormControl,
-  InputLabel, Select, Stack,
+  Box, Button, Typography, Chip, Tooltip, TextField, Stack, Autocomplete,
 } from '@mui/material';
 import { Add, Refresh, Upload, Search, Clear } from '@mui/icons-material';
 import { useSnackbar } from 'notistack';
@@ -9,12 +8,13 @@ import { DataTable, type Column } from '../Common/DataTable';
 import { ConfirmDialog } from '../Common/ConfirmDialog';
 import { MaterialForm } from './MaterialForm';
 import { MaterialExcelImportDialog } from './MaterialExcelImportDialog';
-import { getMaterials, deleteMaterial, getClasses } from '../../api/materials';
+import { getMaterials, deleteMaterial, getClasses, getSemesters } from '../../api/materials';
 import type { Material, MaterialClass } from '../../api/types';
 
 export function MaterialList() {
   const [materials, setMaterials] = useState<Material[]>([]);
   const [classes, setClasses] = useState<MaterialClass[]>([]);
+  const [semesters, setSemesters] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [formOpen, setFormOpen] = useState(false);
@@ -63,8 +63,18 @@ export function MaterialList() {
     }
   }, []);
 
+  const loadSemesters = useCallback(async () => {
+    try {
+      const res = await getSemesters();
+      if (res.success) setSemesters(res.data || []);
+    } catch {
+      // 学期列表加载失败不影响主流程
+    }
+  }, []);
+
   useEffect(() => { load(); }, [load]);
   useEffect(() => { loadClasses(); }, [loadClasses]);
+  useEffect(() => { loadSemesters(); }, [loadSemesters]);
 
   const handleSearch = () => {
     setQuerySemester(semester);
@@ -114,6 +124,11 @@ export function MaterialList() {
       key: 'price',
       label: '单价',
       render: (r) => r.price > 0 ? `¥${r.price.toFixed(2)}` : '-',
+    },
+    {
+      key: 'semester',
+      label: '学期',
+      render: (r) => r.semester || '-',
     },
     {
       key: 'classes',
@@ -168,28 +183,39 @@ export function MaterialList() {
 
       {/* 筛选区：学期 + 班级 + 关键字 */}
       <Box sx={{ display: 'flex', gap: 1, mb: 2, alignItems: 'center', flexWrap: 'wrap' }}>
-        <TextField
+        <Autocomplete
           size="small"
-          label="学期"
-          value={semester}
-          onChange={(e) => setSemester(e.target.value)}
-          placeholder="如 2024-2025-1"
           sx={{ minWidth: 160 }}
-          onKeyDown={(e) => { if (e.key === 'Enter') handleSearch(); }}
+          options={semesters}
+          value={semester || null}
+          onChange={(_, newValue) => setSemester(newValue || '')}
+          renderInput={(params) => <TextField {...params} label="学期" placeholder="选择学期" />}
+          filterOptions={(options, state) => {
+            const inputValue = state.inputValue.toLowerCase();
+            return options.filter((option) =>
+              option.toLowerCase().includes(inputValue)
+            );
+          }}
+          noOptionsText="无匹配学期"
+          clearOnBlur
         />
-        <FormControl size="small" sx={{ minWidth: 160 }}>
-          <InputLabel>班级</InputLabel>
-          <Select
-            value={className}
-            label="班级"
-            onChange={(e) => setClassName(e.target.value)}
-          >
-            <MenuItem value="">全部班级</MenuItem>
-            {classes.map((c) => (
-              <MenuItem key={c.class_id} value={c.class_name}>{c.class_name}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        <Autocomplete
+          size="small"
+          sx={{ minWidth: 200 }}
+          options={classes.map((c) => c.class_name)}
+          value={className || null}
+          onChange={(_, newValue) => setClassName(newValue || '')}
+          renderInput={(params) => <TextField {...params} label="班级" placeholder="搜索班级名称" />}
+          filterOptions={(options, state) => {
+            const inputValue = state.inputValue.toLowerCase();
+            return options.filter((option) =>
+              option.toLowerCase().includes(inputValue)
+            );
+          }}
+          noOptionsText="无匹配班级"
+          clearOnBlur
+          handleHomeEndKeys
+        />
         <TextField
           size="small"
           label="关键字（ISBN/书名/作者/出版社）"

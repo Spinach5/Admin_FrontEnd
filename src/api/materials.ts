@@ -99,6 +99,11 @@ export async function getClasses() {
   return { ...res.data, data: (res.data.data || []).map(mapClass) };
 }
 
+export async function getSemesters() {
+  const res = await client.get<ApiResponse<string[]>>('/materials/semesters');
+  return res.data;
+}
+
 export interface CreateMaterialPayload {
   isbn: string;
   title: string;
